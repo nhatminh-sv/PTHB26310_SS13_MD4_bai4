@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- ============================================= -->
+    <!-- PROPERTIES (Biến cấu hình)                    -->
+    <!-- ============================================= -->
+    <property name="LOG_PATH" value="logs" />
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{requestId}] [%X{clientIp}] %-5level %logger{36} - %msg%n" />
+    <property name="LOG_PATTERN_COLOR" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{requestId}] [%X{clientIp}] %highlight(%-5level) %cyan(%logger{36}) - %msg%n" />
+
+    <!-- ============================================= -->
+    <!-- CONSOLE APPENDER (Có màu sắc)                -->
+    <!-- ============================================= -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN_COLOR}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- ============================================= -->
+    <!-- PATIENT WEB SERVICE FILE APPENDER            -->
+    <!-- ============================================= -->
+    <appender name="PATIENT_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- Đường dẫn file log chính -->
+        <file>${LOG_PATH}/patient_web_service.log</file>
+
+        <!-- ============================================= -->
+        <!-- ROLLING POLICY: Tự động xoay vòng file       -->
+        <!-- ============================================= -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+
+            <!--
+                Pattern tên file khi xoay vòng:
+                - patient_web_service.%d{yyyy-MM-dd}.%i.log
+                - %d{yyyy-MM-dd}: Tạo file mới theo ngày
+                - %i: Đánh số thứ tự khi file đạt kích thước max
+            -->
+            <fileNamePattern>${LOG_PATH}/patient_web_service.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+
+            <!--
+                TimeBasedFileNamingAndTriggeringPolicy:
+                Điều khiển việc tạo file mới dựa trên thời gian và kích thước
+            -->
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+
+                <!--
+                    Kích thước tối đa mỗi file: 2MB
+                    Khi file đạt 2MB, tự động tạo file mới (.1, .2, ...)
+                -->
+                <maxFileSize>2MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+
+            <!--
+                maxHistory: Số ngày lưu log
+                = 7 ngày → Log sẽ tự động bị xóa sau 7 ngày
+            -->
+            <maxHistory>7</maxHistory>
+
+            <!--
+                totalSizeCap: Tổng dung lượng tối đa cho tất cả file log
+                = 500MB → Nếu vượt quá, log cũ nhất sẽ bị xóa
+            -->
+            <totalSizeCap>500MB</totalSizeCap>
+        </rollingPolicy>
+
+        <!-- Định dạng log -->
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- ============================================= -->
+    <!-- APPLICATION FILE APPENDER (Tất cả log)        -->
+    <!-- ============================================= -->
+    <appender name="APPLICATION_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/application.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/application.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>500MB</totalSizeCap>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- ============================================= -->
+    <!-- EMERGENCY FILE APPENDER (Chỉ log ERROR)       -->
+    <!-- ============================================= -->
+    <appender name="EMERGENCY_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/emergency.log</file>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/emergency.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>90</maxHistory>
+            <totalSizeCap>500MB</totalSizeCap>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- ============================================= -->
+    <!-- BORROW FILE APPENDER                          -->
+    <!-- ============================================= -->
+    <appender name="BORROW_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/borrow.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/borrow.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>2MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>500MB</totalSizeCap>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- ============================================= -->
+    <!-- LOGGER THEO PACKAGE                           -->
+    <!-- ============================================= -->
+
+    <!-- Log cho Patient module (Lưu vào patient_web_service.log) -->
+    <logger name="com.example.demo.controller.PatientController" level="INFO" additivity="true">
+        <appender-ref ref="PATIENT_APPENDER" />
+    </logger>
+
+    <logger name="com.example.demo.service.PatientService" level="DEBUG" additivity="true">
+        <appender-ref ref="PATIENT_APPENDER" />
+    </logger>
+
+    <logger name="com.example.demo.repository.PatientRepository" level="DEBUG" additivity="true">
+        <appender-ref ref="PATIENT_APPENDER" />
+    </logger>
+
+    <!-- Log cho Borrow module -->
+    <logger name="com.example.demo.service.BorrowService" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="APPLICATION_FILE" />
+        <appender-ref ref="BORROW_FILE" />
+    </logger>
+
+    <!-- Log cho Reader module -->
+    <logger name="com.example.demo.service.ReaderService" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="APPLICATION_FILE" />
+        <appender-ref ref="READER_FILE" />
+    </logger>
+
+    <!-- Log cho Doctor module -->
+    <logger name="com.example.demo.service.DoctorService" level="DEBUG" />
+
+    <!-- ============================================= -->
+    <!-- ROOT LOGGER                                   -->
+    <!-- ============================================= -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="APPLICATION_FILE" />
+        <appender-ref ref="EMERGENCY_FILE" />
+        <appender-ref ref="PATIENT_APPENDER" />
+    </root>
+
+</configuration>

@@ -1,0 +1,47 @@
+package com.example.gatewayservice.filter;
+
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.core.Ordered;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
+@Component
+public class MedicalLoggingFilter implements GlobalFilter, Ordered {
+
+    @Override
+    public Mono<Void> filter(
+            ServerWebExchange exchange,
+            GatewayFilterChain chain) {
+
+        String ip = exchange.getRequest()
+                .getRemoteAddress() != null
+                ? exchange.getRequest()
+                .getRemoteAddress()
+                .getAddress()
+                .getHostAddress()
+                : "Unknown";
+
+        String method = exchange.getRequest()
+                .getMethod()
+                .name();
+
+        String path = exchange.getRequest()
+                .getURI()
+                .getPath();
+
+        System.out.println(
+                "Client IP: " + ip +
+                        " | Method: " + method +
+                        " | Path: " + path
+        );
+
+        return chain.filter(exchange);
+    }
+
+    @Override
+    public int getOrder() {
+        return -3;
+    }
+}
